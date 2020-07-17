@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="">
+  <meta name="viewport" content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+  <title>test</title>
+
+  <!-- Disable tap highlight on IE -->
+  <meta name="msapplication-tap-highlight" content="no">
+
+  <!-- Web Application Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Add to homescreen for Chrome on Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Web Starter Kit">
+
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Web Starter Kit">
+
+  <!-- Tile icon for Win8 (144x144 + tile color) -->
+  <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
+  <meta name="msapplication-TileColor" content="#2F3BA2">
+  <!-- <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script> -->
+  <script src="//cdn.jsdelivr.net/npm/ramda@latest/dist/ramda.min.js"></script>
+</head>
+
+<body>
+  <div style="width: 100%;">
+
+  </div>
+  <script>
+    console.log(1);
+
+    setTimeout(() => {
+      console.log(2)
+    }, 1000);
+
+    async function fn() {
+      console.log(3);
+      setTimeout(() => {
+        console.log(4);
+      }, 20);
+      return Promise.reject();
+    }
+    async function run() {
+      console.log(5);
+      await fn();
+      console.log(6);
+    }
+
+    run();
+
+    // 约耗时150ms
+    for (let i = 0; i < 90000000; i++) { }
+
+    setTimeout(() => {
+      console.log(7);
+      new Promise(resolve => {
+        console.log(8);
+        resolve();
+      }).then(() => console.log(9))
+    }, 0);
+    console.log(10);
+  </script>
+
+
+
+  <script>
+    function f1() {
+      setTimeout(function () {
+        for (var i = 0; i < 100000000; i++) { }
+        console.log('timer a');
+      }, 0)
+
+      for (var j = 0; j < 5; j++) {
+        console.log(j);
+      }
+
+      setTimeout(function () {
+        console.log('timer b');
+      }, 0)
+
+      let a = new Promise((resolve, reject) => {
+        // @case1
+        // resolve('promise');
+        // @case
+        console.log('promise sync');
+        setTimeout(() => resolve('promise'), 0)
+      });
+      a.then(res => console.log(res));
+
+      function waitFiveSeconds() {
+        var now = (new Date()).getTime();
+        while (((new Date()).getTime() - now) < 5000) { }
+        console.log('finished waiting');
+      }
+
+      document.addEventListener('click', function () {
+        console.log('click');
+      })
+
+      console.log('click begin');
+      waitFiveSeconds();
+    }
+
+    function f2() {
+      console.log('f2');
+    }
+
+    f1();
+    f2();
+
+
+  </script>
+
+  <script>
+    // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Using_promises
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    wait().then(() => console.log('4'));
+    Promise.resolve().then(() => console.log('2')).then(() => console.log('3'));
+    console.log('1'); // 1, 2, 3, 4
+  </script>
+
+  <script>
+    class A {
+      speak(a) {
+        console.log(a);
+      }
+    }
+
+    class C extends A {
+      constructor() {
+        super();
+      }
+      speak(a) {
+        console.log('hi, im' + a);
+      }
+    }
+  </script>
+
+  <script>
+    const getSysData = () => {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve({ count: 1 });
+        }, 500);
+      });
+    }
+    myReq = (data, succ, fail) => {
+      setTimeout(() => {
+        if (data) {
+          succ({ ...data, succ: true });
+        } else {
+          fail(new Error('no reqest data.'));
+        }
+      }, 500);
+    }
+    const request = (url, data, options) => {
+      return new Promise((resolve, reject) => {
+        getSysData().then(res => {
+          const sysData = res;
+          const succFn = (res) => { resolve(res) };
+          const failFn = (ex => reject(ex));
+          myReq({ ...sysData, ...data }, succFn, failFn);
+        })
+      })
+    }
+
+    console.log('before request');
+    request('', { name: 'wzx' }, {}).then(res => console.log(res));
+    console.log('after request');
+  </script>
+
+</body>
+
+</html>
